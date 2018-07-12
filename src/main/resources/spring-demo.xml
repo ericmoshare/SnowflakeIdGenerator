@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+       default-lazy-init="false">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="org.ericmoshare"/>
+
+    <context:property-placeholder location="classpath:application.properties"/>
+
+    <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          init-method="init" destroy-method="close" primary="true">
+        <property name="url" value="${spring.datasource.url}"/>
+        <property name="username" value="${spring.datasource.username}"/>
+        <property name="password" value="${spring.datasource.password}"/>
+        <property name="initialSize" value="${spring.datasource.init-size}"/>
+        <property name="maxActive" value="${spring.datasource.max-active}"/>
+        <property name="minIdle" value="${spring.datasource.min-idle}"/>
+        <property name="maxWait" value="60000"/>
+        <property name="poolPreparedStatements" value="true"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="33"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <property name="minEvictableIdleTimeMillis" value="25200000"/>
+        <property name="removeAbandoned" value="true"/>
+        <property name="removeAbandonedTimeout" value="1800"/>
+        <property name="logAbandoned" value="true"/>
+        <property name="filters" value="mergeStat"/>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg name="dataSource" ref="dataSource"/>
+        <constructor-arg name="lazyInit" value="false"/>
+    </bean>
+
+    <bean id="mysqlSnowflakeIdGenerator" class="org.ericmoshare.uidgenerator.idgenerator.MysqlSnowflakeIdGenerator">
+        <constructor-arg name="jdbcTemplate" ref="jdbcTemplate"/>
+        <constructor-arg name="appName" value="ericmo"/>
+    </bean>
+
+    <bean id="redisConfig" class="org.ericmoshare.uidgenerator.config.RedisConfig">
+        <property name="password" value="${spring.redis.password}"/>
+    </bean>
+
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="minIdle" value="${spring.redis.pool.min-idle}"/>
+        <property name="maxIdle" value="${spring.redis.pool.max-idle}"/>
+        <property name="maxTotal" value="${spring.redis.pool.size}"/>
+        <property name="maxWaitMillis" value="${spring.redis.pool.max-wait}"/>
+        <property name="testOnBorrow" value="${spring.redis.pool.testOnBorrow}"/>
+    </bean>
+
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg name="poolConfig" ref="jedisPoolConfig"/>
+        <constructor-arg name="host" value="${spring.redis.host}"/>
+        <constructor-arg name="port" value="${spring.redis.port}"/>
+        <constructor-arg name="timeout" value="2000"/>
+        <constructor-arg name="password" value="#{redisConfig.getValidPassword()}"/>
+        <constructor-arg name="database" value="${spring.redis.database}"/>
+    </bean>
+
+    <bean id="redisSnowflakeIdGenerator" class="org.ericmoshare.uidgenerator.idgenerator.RedisSnowflakeIdGenerator">
+        <constructor-arg name="jedisPool" ref="jedisPool"/>
+        <constructor-arg name="appName" value="ericmo"/>
+    </bean>
+</beans>

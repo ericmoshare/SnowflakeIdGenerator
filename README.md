@@ -1,2 +1,5 @@
-# SnowflakeIdGenerator
-IdGenerator base on Twitter Snowflake theory
+uid-generator
+-----
+
+[In Chinese 中文版](README.zh_cn.md)
+
