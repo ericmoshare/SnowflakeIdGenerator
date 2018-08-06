@@ -45,7 +45,7 @@ public class RedisSnowflakeIdGenerator extends AbstractSnowflakeIdGenerator {
 
     private void init() {
         Jedis jedis = jedisPool.getResource();
-        Object result = jedis.eval(SCRIPT_ID_AUTO_INCREMENT, 2, HASHKEY + appName, NONCE, AUTO_INCREMENT_PRIMARY_KEY, NetUtils.getMacAndIp());
+        Object result = jedis.eval(SCRIPT_ID_AUTO_INCREMENT, 2, HASHKEY + ":" + appName, NONCE, AUTO_INCREMENT_PRIMARY_KEY, NetUtils.getMacAndIp());
         serverNo = Long.valueOf(String.valueOf(result));
         logger.info("获取当前服务器机器的serverNo:[{}]", serverNo);
     }

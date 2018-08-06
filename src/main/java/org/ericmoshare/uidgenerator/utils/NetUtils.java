@@ -16,6 +16,8 @@ public class NetUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
 
+    private static final String EMPTY = "MAC:EMPTY";
+
     public NetUtils() throws UnknownHostException {
     }
 
@@ -30,6 +32,9 @@ public class NetUtils {
 
             byte[] mac = network.getHardwareAddress();
 
+            if (mac == null || mac.length < 1) {
+                return EMPTY;
+            }
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < mac.length; i++) {
                 sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
