@@ -21,7 +21,7 @@ public class RedisSnowflakeIdGenerator extends AbstractSnowflakeIdGenerator {
             "redis.call('hset', KEYS[1], ARGV[2], pk);     return redis.call('hget', KEYS[1], ARGV[2] );  end; " +
             "return redis.call('hget', KEYS[1], ARGV[2] );";
 
-    private static final String HASHKEY = "xppay_snowflake_servers";
+    private static final String HASHKEY = "snowflake_servers";
 
     private static final String AUTO_INCREMENT_PRIMARY_KEY = "auto_increment_primary_key";
 
